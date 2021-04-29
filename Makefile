@@ -5,9 +5,9 @@ PROG	= jslisten
 DEPCONS	= src/linuxconsole-code/utils
 DEPMINI	= src/minIni/dev
 
-PREFIX := /usr/local
+PREFIX := /home/$(shell logname)/.local
 BINDIR := $(PREFIX)/bin
-SYSDDIR := /etc/systemd/system
+SYSDDIR := /home/$(shell logname)/.config/systemd/user
 
 .PHONY: all
 all: $(PROG)
@@ -22,17 +22,22 @@ jslisten: src/jslisten.o $(DEPCONS)/axbtnmap.o $(DEPMINI)/minIni.o
 
 .PHONY: install
 install: $(PROG) etc/$(PROG).conf utils/$(PROG).service.in
-	install -D -m 755 $(PROG) $(DESTDIR)$(BINDIR)/$(PROG)
+	install -D -m 755 $(PROG) $(BINDIR)/$(PROG)
 	install -D -m 644 etc/$(PROG).conf /home/$(shell logname)/.$(PROG)
 	sed -e 's|#BINDIR#|$(BINDIR)|' -e 's|#USER#|$(shell logname)|' \
 		utils/$(PROG).service.in > $(PROG).service
-	install -D -m 644 $(PROG).service $(DESTDIR)$(SYSDDIR)/$(PROG).service
+	install -D -m 644 $(PROG).service $(SYSDDIR)/$(PROG).service
 	$(RM) $(PROG).service
+	systemctl daemon-reload
+	systemctl enable $(PROG).service && systemctl restart $(PROG).service
 
 .PHONY: uninstall
 uninstall:
-	$(RM) $(DESTDIR)$(BINDIR)/$(PROG)
-	$(RM) $(DESTDIR)$(SYSDDIR)/$(PROG).service
+	systemctl stop $(PROG).service
+	systemctl disable $(PROG).service
+	systemctl daemon-reload
+	$(RM) $(SYSDDIR)/$(PROG).service
+	$(RM) $(BINDIR)/$(PROG)
 
 .PHONY: clean
 clean:

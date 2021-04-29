@@ -1,3 +1,12 @@
+# Local modifications
+- remove axbtnmap and minIni files and instead link with correct projects
+- improve make file, incl install option
+- run as user and not root
+- few quality of life improvements
+
+original docu hereafter:
+
+
 # jslisten
 
 ## Index
