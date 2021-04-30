@@ -1,0 +1,4 @@
+jslisten
+*.o
+*.swp
+.gdb_history

@@ -1,15 +1,17 @@
 [Unit]
-Description=jslisten daemon
+Description=jslisten (JoyStick Listening) daemon
 After=network.target auditd.service
 
 [Service]
 Type=idle
-ExecStart=/bin/sh -ec "exec /opt/bin/jslisten"
+User=#USER#
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=/home/#USER#/.Xauthority"
+ExecStart=/bin/sh -ec "exec #BINDIR#/jslisten"
 ExecReload=/bin/kill -9 $MAINPID
 ExecStop=/bin/kill -9 $MAINPID
 KillMode=process
 Restart=on-failure
-User=pi
 
 [Install]
 WantedBy=multi-user.target

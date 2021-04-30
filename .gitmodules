@@ -1,0 +1,6 @@
+[submodule "src/minIni"]
+	path = src/minIni
+	url = https://github.com/compuphase/minIni
+[submodule "src/linuxconsole-code"]
+	path = src/linuxconsole-code
+	url = https://git.code.sf.net/p/linuxconsole/code
