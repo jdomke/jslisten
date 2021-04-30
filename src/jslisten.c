@@ -54,7 +54,13 @@
 #define NAME_LENGTH     128
 #define MYPROGNAME      "jslisten"
 #define myConfFile      "/.jslisten"
+#ifdef JSLPREFIXDIR
+#define STRINGIZE_NX(A) #A
+#define STRINGIZE(A)    STRINGIZE_NX(A)
+char myGlConfFile[256] = STRINGIZE(JSLPREFIXDIR)"/etc/jslisten.conf";
+#else
 #define myGlConfFile    "/etc/jslisten.conf"
+#endif
 //#define MY_LOG_LEVEL LOG_NOTICE //LOG_DEBUG //LOG_NOTICE
 
 #define INI_BUFFERSIZE  512

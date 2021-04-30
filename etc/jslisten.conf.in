@@ -1,6 +1,6 @@
 ### xbox controller: press left shoulder + righ shoulder + xbox button
 [RetroArch]
-program="flatpak run org.libretro.RetroArch"
+program="su #USER# -c 'flatpak run org.libretro.RetroArch'"
 button1=4
 button2=5
 button3=8
@@ -8,7 +8,7 @@ button4=
 
 ### xbox controller: press left shoulder + righ shoulder + select + start buttons
 [ShutDown]
-program="sudo -u #USER# /usr/bin/gnome-terminal -- /usr/sbin/shutdown -h now"
+program="systemctl poweroff --no-wall --ignore-inhibitors"
 button1=4
 button2=5
 button3=6
