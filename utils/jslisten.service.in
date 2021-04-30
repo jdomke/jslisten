@@ -4,7 +4,6 @@ After=network.target auditd.service
 
 [Service]
 Type=idle
-User=#USER#
 Environment="DISPLAY=:0"
 Environment="XAUTHORITY=/home/#USER#/.Xauthority"
 ExecStart=/bin/sh -ec "exec #BINDIR#/jslisten"

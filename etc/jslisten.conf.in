@@ -7,8 +7,8 @@ button3=8
 button4=
 
 ### xbox controller: press left shoulder + righ shoulder + select + start buttons
-[RetroArch]
-program="systemctl poweroff"
+[ShutDown]
+program="sudo -u #USER# /usr/bin/gnome-terminal -- /usr/sbin/shutdown -h now"
 button1=4
 button2=5
 button3=6

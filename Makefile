@@ -21,21 +21,24 @@ jslisten: src/jslisten.o $(DEPCONS)/axbtnmap.o $(DEPMINI)/minIni.o
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -ludev -o $@
 
 .PHONY: install
-install: $(PROG) etc/$(PROG).conf utils/$(PROG).service.in
+install: $(PROG) etc/$(PROG).conf.in utils/$(PROG).service.in
 	install -D -m 755 $(PROG) $(BINDIR)/$(PROG)
-	install -D -m 644 etc/$(PROG).conf /home/$(shell logname)/.$(PROG)
+	sed -e 's|#USER#|$(shell logname)|' etc/$(PROG).conf.in > $(PROG).conf
+	install -D -m 644 $(PROG).conf /home/$(shell logname)/.$(PROG)
 	sed -e 's|#BINDIR#|$(BINDIR)|' -e 's|#USER#|$(shell logname)|' \
 		utils/$(PROG).service.in > $(PROG).service
 	install -D -m 644 $(PROG).service $(SYSDDIR)/$(PROG).service
-	$(RM) $(PROG).service
-	systemctl daemon-reload
-	systemctl enable $(PROG).service && systemctl restart $(PROG).service
+	$(RM) $(PROG).conf $(PROG).service
+	systemctl --user daemon-reload
+	systemctl --user enable $(PROG).service
+	systemctl --user restart $(PROG).service
+	@echo -e "\n\nif you want the shutdown functionality (see ~/.$(PROG)) then add '$(shell logname) localhost=NOPASSWD: /usr/bin/gnome-terminal' to the /etc/sudoers file"
 
 .PHONY: uninstall
 uninstall:
-	systemctl stop $(PROG).service
-	systemctl disable $(PROG).service
-	systemctl daemon-reload
+	systemctl --user stop $(PROG).service
+	systemctl --user disable $(PROG).service
+	systemctl --user daemon-reload
 	$(RM) $(SYSDDIR)/$(PROG).service
 	$(RM) $(BINDIR)/$(PROG)
 

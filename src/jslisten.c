@@ -51,14 +51,14 @@
 #define true 0
 #define false 1
 
-#define NAME_LENGTH 128
-#define MYPROGNAME "jslisten"
-#define myConfFile "/.jslisten"
-#define myGlConfFile "/etc/jslisten.conf"
+#define NAME_LENGTH     128
+#define MYPROGNAME      "jslisten"
+#define myConfFile      "/.jslisten"
+#define myGlConfFile    "/etc/jslisten.conf"
 //#define MY_LOG_LEVEL LOG_NOTICE //LOG_DEBUG //LOG_NOTICE
 
-#define INI_BUFFERSIZE      512
-#define MAX_HOTKEYS 99
+#define INI_BUFFERSIZE  512
+#define MAX_HOTKEYS     16
 
 
 //---------------------------------
@@ -79,7 +79,7 @@ struct KeySet {
   int button4Active;
   int activeButtons;
   int isTriggered;
-  char swFilename[100];
+  char command[256];
 };
 
 struct KeySet myKeys[MAX_HOTKEYS];
@@ -160,9 +160,9 @@ int getConfigFile() {
 // Get configuration items from the file
 //---------------------------------------
 void readConfig(void) {
-  char str[100];
+  char str[256];
   int s, k;
-  char section[50];
+  char section[64];
   long l;
   int n;
 
@@ -171,9 +171,9 @@ void readConfig(void) {
     if ( numHotkeys < MAX_HOTKEYS ) {
       for (k = 0; ini_getkey(section, k, str, sizearray(str), iniFile) > 0; k++) {
         if ( strncmp("program", str, 7) == 0 ) { // Key found
-          n = ini_gets(section, str, "dummy", myKeys[numHotkeys].swFilename, sizearray(myKeys[numHotkeys].swFilename), iniFile);
-          if ( n > 5 && strncmp("dummy", myKeys[numHotkeys].swFilename, 5) != 0 ) { // Value is not empty
-            syslog(LOG_INFO, "Filename: %s\n", myKeys[numHotkeys].swFilename);
+          n = ini_gets(section, str, "dummy", myKeys[numHotkeys].command, sizearray(myKeys[numHotkeys].command), iniFile);
+          if ( n > 5 && strncmp("dummy", myKeys[numHotkeys].command, 5) != 0 ) { // Value is not empty
+            syslog(LOG_INFO, "Filename: %s\n", myKeys[numHotkeys].command);
           }
         }
         if ( strncmp("button1", str, 7) == 0 ) { // Key found
@@ -220,7 +220,7 @@ void readConfig(void) {
 int checkConfig(void) {
   int rc=0;
   for (int i=0; i<numHotkeys; i++) {
-    if ( sizearray(myKeys[i].swFilename) < 3 ) { // no program make no sense
+    if ( sizearray(myKeys[i].command) < 3 ) { // no program make no sense
       syslog(LOG_ERR, "err: no valid filename provided in section %d. Please check ini file\n", i);
       rc = 1;
     }
@@ -308,7 +308,7 @@ void listenJoy (void) {
   struct udev_list_entry *devices, *dev_list_entry;
 
   // Clear previous joystick
-  joyFD = -1;  
+  joyFD = -1;
 
   /* Create the udev object */
   udev = udev_new();
@@ -339,7 +339,7 @@ void listenJoy (void) {
       syslog (LOG_NOTICE, "Found Device: %s\n", devPath);
       if (joyFD < 0 || strcmp(devPath, myDevPath) == 0) {
         // Open the file descriptor
-        if ((joyFD = open(devPath, O_RDONLY)) < 0) { 
+        if ((joyFD = open(devPath, O_RDONLY)) < 0) {
           syslog (LOG_INFO, "error: failed to open fd\n");
         } else {
           syslog (LOG_NOTICE, "Watching: %s\n", devPath);
@@ -566,7 +566,7 @@ int bindJoy(void) {
           }
           syslog(LOG_INFO, "Swtching mode. ...\n");
           // call external program
-          int rc = system(myKeys[needTrigger].swFilename);
+          int rc = system(myKeys[needTrigger].command);
           if ( rc == 0 ) {
             syslog(LOG_INFO, "Call succesfull\n");
           } else {
